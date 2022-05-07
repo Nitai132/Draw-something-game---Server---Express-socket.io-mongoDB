@@ -1,12 +1,13 @@
-const express = require('express');
+import express, { Request, Response } from "express";
+
 const router = express.Router();
 const healthService = require('../services/healthCheckService');
 
-
-router.get('/check', async (req: any, res: any) => { 
+//API for health check
+router.get('/check', async (req: Request, res: Response) => {
     try {
-        const serverHealthStatus = await healthService.getServerHealth(); 
-        return res.json(serverHealthStatus); 
+        const serverHealthStatus = await healthService.getServerHealth();
+        return res.json(serverHealthStatus);
     } catch (err) {
         console.log(err);
         return res.sendStatus(503);

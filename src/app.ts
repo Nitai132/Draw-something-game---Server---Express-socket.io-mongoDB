@@ -17,9 +17,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+//controllers 
 app.use('/health', healthCheckController);
 app.use('/scores', topScoreController);
+
 
 app.get("/*", function (req, res) {
     res.sendFile(path.join(__dirname, "./public", "index.html"));
@@ -36,18 +37,19 @@ global.io = new Server(httpServer, {
 
 });
 
+//init the server after DB connection
 const initServer = async () => {
     try {
         await mongoose.connect(dbString);
         httpServer.listen(PORT, () => {
             console.log(`Server is up on port:  ${PORT}`);
         });
-    } catch(err) {
+    } catch (err) {
         console.log(err);
     };
 };
 
 initServer();
-//@ts-expect-error
+// @ts-expect-error
 SocketService.addListenersToSocket(global.io);
 export default app;
