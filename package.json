@@ -10,9 +10,9 @@
     "@types/express": "^4.17.13"
   },
   "scripts": {
-    "start": "node public/app.js",
+    "start": "node /public/app.js",
     "postinstall": "tsc",
-    "watch-node": "nodemon public/app.js",
+    "watch-node": "nodemon /public/app.js",
     "watch-ts": "tsc -w"
   },
   "engines": { "node": "16.14.2" }
