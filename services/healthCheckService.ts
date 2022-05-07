@@ -15,4 +15,4 @@ const getServerHealth = async () => {
 };
 
 
-module.exports = { getServerHealth };
+export {};

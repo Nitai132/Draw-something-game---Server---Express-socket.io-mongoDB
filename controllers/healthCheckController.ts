@@ -3,7 +3,7 @@ const router = express.Router();
 const { getServerHealth } = require('../services/healthCheckService');
 
 
-router.get('/check', async (req, res) => { 
+router.get('/check', async (req: any, res: any) => { 
     try {
         const serverHealthStatus = await getServerHealth(); 
         return res.json(serverHealthStatus); 
