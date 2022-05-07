@@ -1,1 +1,1 @@
-web: node app.ts
+web: public/node app.js
