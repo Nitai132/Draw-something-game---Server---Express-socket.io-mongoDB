@@ -14,16 +14,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
-const healthService = require('../services/healthCheckService');
-//API for health check
-router.get('/check', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const topScoreService = require('../services/topScoreService');
+//API for getting the best score
+router.get('/getBest', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const serverHealthStatus = yield healthService.getServerHealth();
-        return res.json(serverHealthStatus);
+        const topScoreDoc = yield topScoreService.getTopScore();
+        return res.json({ currentTopScore: topScoreDoc.currentTopScore, userName: topScoreDoc.userName });
     }
     catch (err) {
         console.log(err);
-        return res.sendStatus(503);
+        return res.sendStatus(400);
+    }
+    ;
+}));
+//API for setting the best score
+router.post('/setBestScore', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { newBestScore, userName } = req.body;
+        yield topScoreService.setTopScore(newBestScore, userName);
+        return res.sendStatus(200);
+    }
+    catch (err) {
+        console.log(err);
+        return res.sendStatus(400);
     }
     ;
 }));

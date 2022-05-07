@@ -9,12 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+;
 const addListenersToSocket = (io) => {
-    //אירוע התחברות לקוח
+    //on new user login
     let users = [];
     io.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('user connected', socket.id);
-        //האזנה לכניסה ללובי - קורה לאחר שהמשתמש הקליד שם
+        //listen to new user lobby enterance + emit to all other lobby users that a new user logged into the lobby
         socket.on('enterLobby', (userData) => __awaiter(void 0, void 0, void 0, function* () {
             yield users.push({ name: userData, id: socket.id });
             yield socket.join('lobby');
@@ -30,12 +31,12 @@ const addListenersToSocket = (io) => {
             socket.emit('usersData', lobbyUsers);
             socket.to('lobby').emit('userJoinedLobby', lobbyUsers);
         }));
-        //האזנה להזמנות למשחק
+        //listen to new game invitation
         socket.on('gameInviteSent', (data) => __awaiter(void 0, void 0, void 0, function* () {
             const emitTo = users.filter((user) => (user.name === data.inviteTo))[0];
             socket.to(emitTo.id).emit('recieveGameInvite', data);
         }));
-        //האזנה להתחלת משחק
+        //listen to new game that started + send users to private game room + leave lobby
         socket.on('startGame', (opponents) => {
             const inviteBy = users.filter((user) => user.name === opponents.inviteBy)[0];
             const inviteTo = users.filter((user) => user.name === opponents.inviteTo)[0];
@@ -52,21 +53,29 @@ const addListenersToSocket = (io) => {
                 socket.to('lobby').emit('userLeftLobby', users);
             });
         });
+        //listen to a user that is drawing
         socket.on('userIsDrawing', (data) => {
             socket.broadcast.to(`room${data.roomId}`).emit('newDrawWasMade', data.currentImage);
         });
+        //listen to word sent by Drawer to guesser
         socket.on('sendWordToGuesser', (data) => {
             socket.broadcast.to(`room${data.roomId}`).emit('getWordFromDrawer', data.word);
         });
+        //listen to change roles on the Guesser player and change the Drawer player's role as well
         socket.on('changeRoles', (data) => {
             socket.broadcast.to(`room${data.roomId}`).emit('changeToGuesser', data.scoreToAdd);
         });
+        //listen to user that has left the game and alert his opponent + send him to loby + leave room
         socket.on('userLeftGame', (roomId) => __awaiter(void 0, void 0, void 0, function* () {
             console.log({ 'userLeftroom': roomId });
             yield socket.broadcast.to(`room${roomId}`).emit(`opponentLeftRoom`);
             socket.leave(`room${roomId}`);
         }));
-        //אירוע התנתקות לקוח
+        //listen to new best score and emit to all online users (updates the new best score on client side)
+        socket.on('NewBestScore', (data) => {
+            socket.broadcast.emit('BestScoreChanged', data);
+        });
+        //on user logout
         socket.on("disconnect", () => __awaiter(void 0, void 0, void 0, function* () {
             const filerOutDissconnectedUser = users.filter((user) => user.id !== socket.id);
             users = filerOutDissconnectedUser;

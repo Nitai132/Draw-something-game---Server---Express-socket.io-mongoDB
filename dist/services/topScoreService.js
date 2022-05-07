@@ -12,19 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const router = express_1.default.Router();
-const healthService = require('../services/healthCheckService');
-//API for health check
-router.get('/check', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const topScore_model_1 = __importDefault(require("../models/topScore.model"));
+//get the current top score from DB
+const getTopScore = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const serverHealthStatus = yield healthService.getServerHealth();
-        return res.json(serverHealthStatus);
+        const currentTopScore = yield topScore_model_1.default.findOne({ topScoresDocument: true });
+        return currentTopScore;
     }
     catch (err) {
         console.log(err);
-        return res.sendStatus(503);
+        throw err;
     }
     ;
-}));
-module.exports = router;
+});
+//set new top score into the DB
+const setTopScore = (newBestScore, userName) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return topScore_model_1.default.updateOne({ topScoresDocument: true }, { $set: { currentTopScore: newBestScore, userName: userName } });
+    }
+    catch (err) {
+        console.log(err);
+    }
+    ;
+});
+module.exports = { getTopScore, setTopScore };
