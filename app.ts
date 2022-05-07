@@ -33,7 +33,7 @@ global.io = new Server(httpServer, {
 
 const initServer = () => {
     httpServer.listen(PORT, () => {
-        console.log(`Server os up on port:  ${PORT}`);
+        console.log(`Server is up on port:  ${PORT}`);
     });
 };
 
